@@ -63,6 +63,5 @@ public class Sender {
         //关闭连接
         channel.close();
         connection.close();
-
     }
 }
