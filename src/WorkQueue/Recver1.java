@@ -1,4 +1,4 @@
-package hello;
+package WorkQueue;
 
 //
 //                            _ooOoo_  
@@ -32,34 +32,42 @@ package hello;
 //                  别人笑我忒疯癫，我笑自己命太贱；  
 //  
 
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
+
 import Utils.ConnextionUtil;
+import com.rabbitmq.client.*;
+
+import java.io.IOException;
 
 /**
  * Created by chong
  */
-public class Sender {
-    private final static String QUEUE = "MQ_SCUT1";//队列的名字
+public class Recver1 {
+    private final static String QUEUE = "MQ_WORK";//队列的名字
 
-    public static void main(String[] args) throws Exception {
-        //获取连接
+
+    public static void main(String[] args) throws  Exception {
         Connection connection = ConnextionUtil.getConnection();
-        //创建通道
         Channel channel = connection.createChannel();
+        channel.queueDeclare(QUEUE,false,false,false,null);
+        //同一时刻服务器只会发一条消息给消费者,只有当前消费者将消息处理完成后才会获取到下一条消息
+        //注释掉后可以获取多条消息,但是会一条一条处理
+        channel.basicQos(1);//告诉服务器,在我们没有确认当前消息完成之前,不要给我发新的消息
 
-        //声明队列,如果队列存在则什么都不做,如果不存在才创建
-        // 参数1 队列的名字
-        //参数2 是否持久化队列,我们的队列模式是在内存中的,如果 rabbitmq 重启会丢失,如果我们设置为 true, 则会保存到 erlang 自带的数据库中,重启后会重新读取
-        //参数3 是否排外,有两个作用,第一个当我们的连接关闭后是否会自动删除队列,作用二 是否私有当天前队列,如果私有了,其他通道不可以访问当前队列,如果为 true, 一般是一个队列只适用于一个消费者的时候
-        //参数4 是否自动删除
-        //参数5 我们的一些其他参数
-        channel.queueDeclare(QUEUE, false, false, false, null);
-        //发送内容
-         channel.basicPublish("",QUEUE,null,"今晚聚餐 黑巴扎黑".getBytes("UTF-8"));
-        //关闭连接
-        channel.close();
-        connection.close();
-
+        DefaultConsumer consumer =new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                //当我们收到消息的时候调用
+                System.out.println("消费者1 收到的内容: " + new String(body));
+                try {
+                    Thread.sleep(2000);//模拟耗时的任务执行
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //参数2： false 为确认收到消息; true 为拒接收到消息
+                channel.basicAck(envelope.getDeliveryTag(), false);
+            }
+        };
+        //注册消费者, 参数2 手动确认,代表我们收到消息后需要手动告诉服务器,我收到消息了
+        channel.basicConsume(QUEUE,false,consumer);
     }
 }

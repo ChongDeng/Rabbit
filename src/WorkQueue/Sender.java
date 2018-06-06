@@ -1,4 +1,4 @@
-package hello;
+package WorkQueue;
 
 //
 //                            _ooOoo_  
@@ -32,15 +32,15 @@ package hello;
 //                  别人笑我忒疯癫，我笑自己命太贱；  
 //  
 
+import Utils.ConnextionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
-import Utils.ConnextionUtil;
 
 /**
- * Created by chong
+ * Created by Chong
  */
 public class Sender {
-    private final static String QUEUE = "MQ_SCUT1";//队列的名字
+    private final static String QUEUE = "MQ_WORK";//队列的名字
 
     public static void main(String[] args) throws Exception {
         //获取连接
@@ -55,8 +55,11 @@ public class Sender {
         //参数4 是否自动删除
         //参数5 我们的一些其他参数
         channel.queueDeclare(QUEUE, false, false, false, null);
-        //发送内容
-         channel.basicPublish("",QUEUE,null,"今晚聚餐 黑巴扎黑".getBytes("UTF-8"));
+        for (int i = 0; i < 100; i++) {
+            //发送内容
+            channel.basicPublish("",QUEUE,null,("今晚聚餐" + i).getBytes("UTF-8"));
+            //Thread.sleep(5*i);
+        }
         //关闭连接
         channel.close();
         connection.close();

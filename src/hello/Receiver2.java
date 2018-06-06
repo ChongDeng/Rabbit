@@ -1,7 +1,7 @@
 package hello;
 
 import com.rabbitmq.client.*;
-import uitl.ConnextionUtil;
+import Utils.ConnextionUtil;
 
 import java.io.IOException;
 

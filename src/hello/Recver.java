@@ -35,7 +35,7 @@ package hello;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.QueueingConsumer;
-import uitl.ConnextionUtil;
+import Utils.ConnextionUtil;
 
 /**
  * Created by chong
