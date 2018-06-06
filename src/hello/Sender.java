@@ -56,7 +56,7 @@ public class Sender {
         //参数5 我们的一些其他参数
         channel.queueDeclare(QUEUE, false, false, false, null);
         //发送内容
-         channel.basicPublish("",QUEUE,null,"今晚聚餐".getBytes());
+         channel.basicPublish("",QUEUE,null,"今晚聚餐 黑巴扎黑".getBytes("UTF-8"));
         //关闭连接
         channel.close();
         connection.close();

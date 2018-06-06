@@ -43,7 +43,7 @@ import com.rabbitmq.client.ConnectionFactory;
 public class ConnextionUtil {
      public static Connection getConnection () throws  Exception{
          ConnectionFactory connectionFactory = new ConnectionFactory();
-         connectionFactory.setHost("192.168.1.93");//设置 server 的地址
+         connectionFactory.setHost("192.168.1.108");//设置 server 的地址
          connectionFactory.setPort(5672);
          connectionFactory.setUsername("root");
          connectionFactory.setPassword("root123");
