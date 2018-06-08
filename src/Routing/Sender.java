@@ -1,4 +1,4 @@
-package com.qianfeng.route;
+package Routing;
 
 //
 //                            _ooOoo_  
@@ -32,22 +32,21 @@ package com.qianfeng.route;
 //                  别人笑我忒疯癫，我笑自己命太贱；  
 //  
 
-
-import com.qianfeng.uitl.ConnextionUtil;
+import Utils.ConnextionUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 
 /**
- * Created by jackiechan on 2018/4/5/下午4:43
+ * Created by Chong
  */
 public class Sender {
-    private final static String EXCHANGE_NAME = "testeoute";
+    private final static String EXCHANGE_NAME = "EX_Routing";
 
     public static void main(String[] args) throws  Exception{
         Connection connection = ConnextionUtil.getConnection();
         Channel channel = connection.createChannel();
         channel.exchangeDeclare(EXCHANGE_NAME, "direct");//定义路由格式的交换机
-        channel.basicPublish(EXCHANGE_NAME, "key1", null, "路由消息aaaaaa".getBytes());
+        channel.basicPublish(EXCHANGE_NAME, "key_男人", null, "路由消息1".getBytes());
         channel.close();
         connection.close();
     }

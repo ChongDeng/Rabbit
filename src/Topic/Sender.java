@@ -1,4 +1,4 @@
-package Routing;
+package Topic;
 
 //
 //                            _ooOoo_  
@@ -32,36 +32,24 @@ package Routing;
 //                  别人笑我忒疯癫，我笑自己命太贱；  
 //  
 
-
 import Utils.ConnextionUtil;
-import com.rabbitmq.client.*;
-
-import java.io.IOException;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
 
 /**
  * Created by Chong
  */
-public class Recver2 {
-    private final static String EXCHANGE_NAME = "EX_Routing";//定义交换机的名字
-    private final static String QUEUE = "MQ_Routing2";
+public class Sender {
+    private final static String EXCHANGE_NAME = "EX_Topic";
 
     public static void main(String[] args) throws Exception{
         Connection connection = ConnextionUtil.getConnection();
         Channel channel = connection.createChannel();
-        channel.queueDeclare(QUEUE, false, false, false,null);
-        //绑定队列到交换机
-        //参数3 标记,绑定到交换机的时候会指定一个标记,只有和它一样的标记的消息才会被当前消费者收到
-        channel.queueBind(QUEUE, EXCHANGE_NAME, "key_男人");
-        //如果要接收多个标记,只需要再执行一次即可
-        channel.queueBind(QUEUE, EXCHANGE_NAME, "key_丑");
-        channel.basicQos(1);
-        DefaultConsumer consumer=new DefaultConsumer(channel){
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                System.out.println("消费者2 收到消息: " + new String(body));
-                channel.basicAck(envelope.getDeliveryTag(), false);
-            }
-        };
-        channel.basicConsume(QUEUE, false, consumer);
+        // 声明exchange,声明为 topic 也就是通配符类型
+        channel.exchangeDeclare(EXCHANGE_NAME, "topic");
+        //发送usa.west.news数据,凡是能匹配到这个关键词的都会收到
+        channel.basicPublish(EXCHANGE_NAME, "usa.west.news", null, "消息为usa west news".getBytes());
+        channel.close();
+        connection.close();
     }
 }
