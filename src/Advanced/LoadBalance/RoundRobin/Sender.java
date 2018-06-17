@@ -1,10 +1,4 @@
-package hello;
-
-import com.rabbitmq.client.*;
-import Utils.ConnextionUtil;
-
-import java.io.IOException;
-
+package Advanced.LoadBalance.RoundRobin;
 //
 //                            _ooOoo_
 //                           o8888888o
@@ -37,30 +31,40 @@ import java.io.IOException;
 //                  别人笑我忒疯癫，我笑自己命太贱；
 //
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import Utils.ConnextionUtil;
+import com.rabbitmq.client.ConnectionFactory;
+
 /**
  * Created by chong
  */
-public class Receiver2 {
-    private final static String QUEUE = "MQ_SCUT2";//队列的名字
+public class Sender {
+    private final static String QUEUE = "MQ_RoundRobin4";//队列的名字
 
-    public static void main(String[] args) throws Exception{
-        Connection connection = ConnextionUtil.getConnection();
-        Channel channel = connection.createChannel();
-        channel.queueDeclare(QUEUE,false,false,false,null);
+    public static void main(String[] args) throws Exception {
+        for(int i = 0; i < 5; ++i){
 
-        System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-        /* Since RabbitMQ Server will push messages asynchronously, we provide a callback
-           in the form of an object that will buffer the messages until we're ready to use them
-        * */
-        Consumer consumer = new DefaultConsumer(channel) {
-            @Override
-            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body)
-                    throws IOException {
-                String message = new String(body, "UTF-8");
-                System.out.println(" [x] Received: '" + message + "'");
-            }
-        };
-        //接收消息 ,参数2是自动确认
-        channel.basicConsume(QUEUE, true, consumer);
+            String ServerIP = RoundRobin.getConnectionAddress();
+
+            ConnectionFactory connectionFactory = new ConnectionFactory();
+            connectionFactory.setHost(ServerIP);//设置 server 的地址
+            connectionFactory.setPort(5672);
+            connectionFactory.setUsername("root");
+            connectionFactory.setPassword("root123");
+            //获取连接
+            Connection connection = connectionFactory.newConnection();//创建一个新的连接
+            //创建通道
+            Channel channel = connection.createChannel();
+
+            channel.queueDeclare(QUEUE, false, false, false, null);
+
+            //发送内容
+            channel.basicPublish("",QUEUE,null,("今晚聚餐 黑巴扎黑" + i).getBytes("UTF-8"));
+
+            //关闭连接
+            channel.close();
+            connection.close();
+        }
     }
 }

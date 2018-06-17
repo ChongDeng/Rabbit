@@ -40,7 +40,7 @@ import Utils.ConnextionUtil;
  * Created by chong
  */
 public class Sender {
-    private final static String QUEUE = "MQ_SCUT1";//队列的名字
+    private final static String QUEUE = "MQ_SCUT2";//队列的名字
 
     public static void main(String[] args) throws Exception {
         //获取连接

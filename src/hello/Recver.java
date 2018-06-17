@@ -41,7 +41,7 @@ import Utils.ConnextionUtil;
  * Created by chong
  */
 public class Recver {
-    private final static String QUEUE = "MQ_SCUT1";//队列的名字
+    private final static String QUEUE = "MQ_SCUT2";//队列的名字
 
     public static void main(String[] args) throws Exception{
         Connection connection = ConnextionUtil.getConnection();
